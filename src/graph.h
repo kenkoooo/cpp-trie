@@ -9,5 +9,6 @@ private:
 
 public:
   Node(const std::string_view str);
+  constexpr auto get_str() const noexcept { return this->str; }
 };
 } // namespace cpp_trie

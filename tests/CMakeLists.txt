@@ -14,3 +14,10 @@ target_link_libraries(converter_test
 )
 add_test(converter_test converter_test)
 
+add_executable(search_test search_test.cpp)
+target_link_libraries(search_test
+    gtest
+    gtest_main
+)
+add_test(search_test search_test)
+

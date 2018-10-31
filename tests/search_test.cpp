@@ -43,3 +43,18 @@ TEST(search, search_test) {
     ASSERT_EQ(result[0].pos, 11);
   }
 }
+
+TEST(search, wrapper_search) {
+  struct DataA : utils::BlockData {
+    bool matched = false;
+  };
+  struct DataB : utils::BlockData {
+    shared_ptr<DataA> a;
+  };
+
+  auto graph_a =
+      "a"_s + "b"_s + ("c"_s | "d"_s([](auto *d) { d->matched = true; }));
+  auto ptr_a = convert<DataA>(&graph_a);
+
+  auto graph_b = "e"_s;
+}

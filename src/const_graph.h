@@ -13,7 +13,8 @@ template <typename Callback, typename Weight> class Node {
   const Weight weight;
 
 public:
-  constexpr Node(const std::string_view str, const Callback callback,
+  constexpr Node(const std::string_view str,
+                 const Callback callback,
                  const Weight weight)
       : str(str), callback(callback), weight(weight) {}
 
@@ -138,5 +139,4 @@ template <typename Content, bool Horizontal, typename Next>
 constexpr auto operator*(double w, const Link<Content, Horizontal, Next> link) {
   return link + EMPTY_NODE * w;
 }
-
 } // namespace cpp_trie::const_graph

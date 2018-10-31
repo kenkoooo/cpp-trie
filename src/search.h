@@ -65,24 +65,7 @@ constexpr std::vector<Data> search_link(const Link<Data> *link,
 template <typename Data>
 constexpr std::vector<Data> search_node(const Node<Data> *node,
                                         const Data &data) {
-  if (data.matched(node->get_str())) {
-    auto next_pos = data.pos + node->get_str().size();
-    auto next_weight = data.weight * node->get_weight()(&data);
-
-    auto &input = data.input;
-    if (input.size() > next_pos && input[next_pos] == ' ') {
-      next_pos += 1;
-    }
-
-    if (next_weight > 0.0) {
-      Data next_data = data;
-      next_data.pos = next_pos;
-      next_data.weight = next_weight;
-      node->get_callback()(&next_data);
-      return {next_data};
-    }
-  }
-  return {};
+  return node->propagate(data);
 }
 
 template <typename Data, typename InnerData>

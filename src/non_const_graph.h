@@ -5,27 +5,54 @@
 #include <memory>
 #include <string_view>
 #include <variant>
+#include <vector>
 
 namespace cpp_trie::non_const_graph {
 
 template <typename Data> class Node {
+public:
+  virtual std::vector<Data> propagate(const Data &data) const noexcept = 0;
+  virtual ~Node() {}
+};
+
+template <typename Data> class SingleStringNode : public Node<Data> {
 private:
   using Callback = std::function<void(Data *)>;
   using Weight = std::function<double(const Data *)>;
 
   const std::string_view str;
+
+protected:
   const Callback callback;
   const Weight weight;
 
 public:
-  constexpr Node(const std::string_view str,
-                 const Callback callback,
-                 const Weight weight)
-      : str(str), callback(callback), weight(weight) {}
+  constexpr SingleStringNode(const std::string_view str,
+                             const Callback callback,
+                             const Weight weight)
+      : Node<Data>(), str(str), callback(callback), weight(weight) {}
 
-  constexpr auto get_str() const noexcept { return this->str; }
-  constexpr auto get_callback() const noexcept { return this->callback; }
-  constexpr auto get_weight() const noexcept { return this->weight; }
+  virtual std::vector<Data> propagate(const Data &data) const
+      noexcept override {
+    if (data.matched(this->str)) {
+      auto next_pos = data.pos + this->str.size();
+      auto next_weight = data.weight * this->weight(&data);
+
+      auto &input = data.input;
+      if (input.size() > next_pos && input[next_pos] == ' ') {
+        next_pos += 1;
+      }
+
+      if (next_weight > 0.0) {
+        Data next_data = data;
+        next_data.pos = next_pos;
+        next_data.weight = next_weight;
+        this->callback(&next_data);
+        return {next_data};
+      }
+    }
+    return {};
+  }
 };
 
 template <typename Data> class Link {
@@ -62,7 +89,7 @@ public:
   }
 };
 
-template <typename Data, typename InnerData> class Wrapper {
+template <typename Data, typename InnerData> class Wrapper : public Node<Data> {
 private:
   using Setup = std::function<void(const Data *, InnerData *)>;
   using TearDown = std::function<void(Data *, const InnerData &)>;
@@ -75,7 +102,6 @@ public:
 
   constexpr Wrapper(Link<InnerData> *ptr, Setup setup, TearDown tear_down)
       : ptr(ptr), setup(setup), tear_down(tear_down) {}
-  constexpr const Link<InnerData> *get() const noexcept { return this->ptr; }
 };
 
 } // namespace cpp_trie::non_const_graph

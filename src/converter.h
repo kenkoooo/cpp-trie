@@ -15,7 +15,8 @@ convert(const const_graph::Node<C, W> *node) noexcept {
   auto callback = node->get_callback();
   auto weight = node->get_weight();
   auto str = node->get_str();
-  return std::make_unique<non_const_graph::Node<Data>>(str, callback, weight);
+  return std::make_unique<non_const_graph::SingleStringNode<Data>>(
+      str, callback, weight);
 }
 
 template <typename Data, typename Content, bool Horizontal, typename Next>

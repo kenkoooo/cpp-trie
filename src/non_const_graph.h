@@ -102,6 +102,26 @@ public:
 
   constexpr Wrapper(Link<InnerData> *ptr, Setup setup, TearDown tear_down)
       : ptr(ptr), setup(setup), tear_down(tear_down) {}
+
+  virtual std::vector<Data> propagate(const Data &init_data) const
+      noexcept override {
+    InnerData init_inner;
+    init_inner.pos = init_data.pos;
+    init_inner.weight = init_data.weight;
+    init_inner.input = init_data.input;
+    this->setup(&init_data, &init_inner);
+
+    std::vector<InnerData> inner_results = search_link(ptr, init_inner);
+    std::vector<Data> results;
+    for (const auto &inner : inner_results) {
+      Data data = init_data;
+      data.pos = inner.pos;
+      data.weight = inner.weight;
+      this->tear_down(&data, inner);
+      results.push_back(data);
+    }
+    return results;
+  }
 };
 
 } // namespace cpp_trie::non_const_graph

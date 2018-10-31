@@ -8,8 +8,6 @@
 namespace cpp_trie::search {
 template <typename Data> using Node = cpp_trie::non_const_graph::Node<Data>;
 template <typename Data> using Link = cpp_trie::non_const_graph::Link<Data>;
-template <typename Data, typename InnerData>
-using Wrapper = cpp_trie::non_const_graph::Wrapper<Data, InnerData>;
 
 template <typename Data>
 constexpr std::vector<Data> search_link(const Link<Data> *link,
@@ -66,29 +64,6 @@ template <typename Data>
 constexpr std::vector<Data> search_node(const Node<Data> *node,
                                         const Data &data) {
   return node->propagate(data);
-}
-
-template <typename Data, typename InnerData>
-constexpr std::vector<Data>
-search_wrapper(const Wrapper<Data, InnerData> *wrapper, const Data &init_data) {
-  const Link<InnerData> *ptr = wrapper->get();
-
-  InnerData init_inner;
-  init_inner.pos = init_data.pos;
-  init_inner.weight = init_data.weight;
-  init_inner.input = init_data.input;
-  wrapper->setup(&init_data, &init_inner);
-
-  std::vector<InnerData> inner_results = search_link(ptr, init_inner);
-  std::vector<Data> results;
-  for (const auto &inner : inner_results) {
-    Data data = init_data;
-    data.pos = inner.pos;
-    data.weight = inner.weight;
-    wrapper->tear_down(&data, inner);
-    results.push_back(data);
-  }
-  return results;
 }
 
 } // namespace cpp_trie::search

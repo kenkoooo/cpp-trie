@@ -46,14 +46,14 @@ TEST(search, search_test) {
 
 TEST(search, wrapper_search) {
   struct DataA : utils::BlockData {
-    bool matched = false;
+    bool match = false;
   };
   struct DataB : utils::BlockData {
     shared_ptr<DataA> a;
   };
 
   auto graph_a =
-      "a"_s + "b"_s + ("c"_s | "d"_s([](auto *d) { d->matched = true; }));
+      "a"_s + "b"_s + ("c"_s | "d"_s([](auto *d) { d->match = true; }));
   auto ptr_a = convert<DataA>(&graph_a);
 
   auto graph_b = "e"_s;

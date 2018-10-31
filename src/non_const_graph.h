@@ -34,7 +34,7 @@ public:
 
   virtual std::vector<Data> propagate(const Data &data) const
       noexcept override {
-    if (data.matched(this->str)) {
+    if (data.given_string_is_matched(this->str)) {
       auto next_pos = data.pos + this->str.size();
       auto next_weight = data.weight * this->weight(&data);
 

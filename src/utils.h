@@ -8,7 +8,8 @@ struct BlockData {
   std::size_t pos;
   double weight;
 
-  constexpr bool matched(const std::string_view &s) const noexcept {
+  constexpr bool given_string_is_matched(const std::string_view &s) const
+      noexcept {
     return this->input.substr(this->pos, s.size()) == s;
   }
 };

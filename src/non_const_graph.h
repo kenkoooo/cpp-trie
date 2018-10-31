@@ -61,4 +61,21 @@ public:
     return this->next.get();
   }
 };
+
+template <typename Data, typename InnerData> class Wrapper {
+private:
+  using Setup = std::function<void(const Data *, InnerData *)>;
+  using TearDown = std::function<void(Data *, const InnerData &)>;
+
+  const Link<InnerData> *ptr;
+
+public:
+  const Setup setup;
+  const TearDown tear_down;
+
+  constexpr Wrapper(Link<InnerData> *ptr, Setup setup, TearDown tear_down)
+      : ptr(ptr), setup(setup), tear_down(tear_down) {}
+  constexpr const Link<InnerData> *get() const noexcept { return this->ptr; }
+};
+
 } // namespace cpp_trie::non_const_graph

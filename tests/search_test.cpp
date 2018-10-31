@@ -2,6 +2,7 @@
 #include "non_const_graph.h"
 #include "search.h"
 #include "utils.h"
+#include "wrapper.h"
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -56,5 +57,30 @@ TEST(search, wrapper_search) {
       "a"_s + "b"_s + ("c"_s | "d"_s([](auto *d) { d->match = true; }));
   auto ptr_a = convert<DataA>(&graph_a);
 
-  auto graph_b = "e"_s;
+  auto graph_b = "e"_s +
+                 ConstWrapper(ptr_a.get(),
+                              [](const auto *b, auto *a) {},
+                              [](auto *b, const auto &a) {
+                                b->a = make_shared<DataA>(a);
+                              }) +
+                 "f"_s;
+  auto ptr_b = convert<DataB>(&graph_b);
+  {
+    DataB b;
+    b.input = "e a b c f";
+    b.pos = 0;
+    b.weight = 1.0;
+    auto results = search::search_link(ptr_b.get(), b);
+    ASSERT_EQ(results.size(), 1);
+    ASSERT_FALSE(results[0].a->match);
+  }
+  {
+    DataB b;
+    b.input = "e a b d f";
+    b.pos = 0;
+    b.weight = 1.0;
+    auto results = search::search_link(ptr_b.get(), b);
+    ASSERT_EQ(results.size(), 1);
+    ASSERT_TRUE(results[0].a->match);
+  }
 }

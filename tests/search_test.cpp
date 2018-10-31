@@ -23,7 +23,21 @@ TEST(search, search_test) {
     t.weight = 1.0;
     t.input = "a b c d g";
     auto ptr = convert<Data>(&graph);
-    auto result = search::search(ptr.get(), t);
+    const auto p = ptr.get();
+    auto result = search::search_link(ptr.get(), t);
     ASSERT_EQ(result.size(), 1);
+    ASSERT_FALSE(result[0].ok);
+  }
+
+  {
+    Data t;
+    t.pos = 0;
+    t.weight = 1.0;
+    t.input = "a b c e f g";
+    auto ptr = convert<Data>(&graph);
+    const auto p = ptr.get();
+    auto result = search::search_link(ptr.get(), t);
+    ASSERT_EQ(result.size(), 1);
+    ASSERT_TRUE(result[0].ok);
   }
 }

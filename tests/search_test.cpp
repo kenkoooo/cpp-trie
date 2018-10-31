@@ -27,6 +27,7 @@ TEST(search, search_test) {
     auto result = search::search_link(ptr.get(), t);
     ASSERT_EQ(result.size(), 1);
     ASSERT_FALSE(result[0].ok);
+    ASSERT_EQ(result[0].pos, 9);
   }
 
   {
@@ -39,5 +40,6 @@ TEST(search, search_test) {
     auto result = search::search_link(ptr.get(), t);
     ASSERT_EQ(result.size(), 1);
     ASSERT_TRUE(result[0].ok);
+    ASSERT_EQ(result[0].pos, 11);
   }
 }
